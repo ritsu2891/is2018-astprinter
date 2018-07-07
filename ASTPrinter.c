@@ -1,26 +1,18 @@
-/*  AST (Abstract Syntax Tree) Printer, version 0.1  */
+/*  AST (Abstract Syntax Tree) Printer, version 0.2  */
 
 /*  Provides a means for visualizing nodes and symbol tables of abstract syntax trees and improves debugging efficiency.
-    Please use function that marked "# USE THIS". You can also use other functions. But functions which isn't marked have extra argument "offset". Use it with "offset" ex.0 or make another version which dosen't have "offset".
-    If you can't understand how to use, please notify me. Then I'll teach you, or make help documents.
     (c) 2018, Ritsuki KOKUBO
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "ast.h"
-#include "astprinter.h"
+#include "ASTPrinter.h"
 
 /*-------------.
 | Node Printer |
 `--------------*/
 
 // Symbol
-// # USE THIS
 void printSym(SymEntryPtr s) {
   if (s == NULL) {
-    fprintf(stderr, "(NULL)\n");
     return;
   }
 
@@ -47,10 +39,8 @@ void printSym(SymEntryPtr s) {
 }
 
 // Expression
-// # USE THIS
 void printExpr(ExprNodePtr e) {
   if (e == NULL) {
-    fprintf(stderr, "(NULL)\n");
     return;
   }
 
@@ -140,10 +130,8 @@ void printExpr(ExprNodePtr e) {
 }
 
 // Statement
-// # USE THIS
 void printStmt(StmtNodePtr s) {
   if (s == NULL) {
-    fprintf(stderr, "(NULL)\n");
     return;
   }
 
@@ -170,10 +158,8 @@ void printStmt(StmtNodePtr s) {
 }
 
 // Definition
-// # USE THIS
 void printDef(DefNodePtr d) {
   if (d == NULL) {
-    fprintf(stderr, "(NULL)\n");
     return;
   }
 
@@ -211,19 +197,16 @@ void printOffsetSpace(int offset) {
 
 // Expression Tree (Expression with its member)
 void printExprTree(ExprNodePtr e, int offset) {
-  printOffsetSpace(offset);
   if (e == NULL) {
-    fprintf(stderr, "(NULL)\n");
     return;
   }
-  fprintf(stderr, "[Expression]\n");
   printOffsetSpace(offset);
   printExpr(e);
 
-  printOffsetSpace(offset);
-  fprintf(stderr, "[Sym]\n");
-  printOffsetSpace(offset);
-  printSym(e->sym);
+  if (e->sym != NULL) {
+    printOffsetSpace(offset+2);
+    printSym(e->sym);
+  }
 
   printExprTree(e->sub1, offset+2);
   printExprTree(e->sub2, offset+2);
@@ -233,12 +216,9 @@ void printExprTree(ExprNodePtr e, int offset) {
 // Statement Tree (Statement -> Expression)
 void printStmtTree(StmtNodePtr s, int offset) {
   StmtNodePtr stmt_p = NULL;
-  printOffsetSpace(offset);
   if (s == NULL) {
-    fprintf(stderr, "(NULL)\n");
     return;
   }
-  fprintf(stderr, "[Statement]\n");
   stmt_p = s;
   while(stmt_p != NULL) {
     printOffsetSpace(offset);
@@ -246,12 +226,8 @@ void printStmtTree(StmtNodePtr s, int offset) {
 
     printExprTree(stmt_p->expr, offset+2);
 
-    printOffsetSpace(offset+2);
-    fprintf(stderr, "[St1]\n");
     printStmtTree(stmt_p->st1, offset+2);
 
-    printOffsetSpace(offset+2);
-    fprintf(stderr, "[St2]\n");
     printStmtTree(stmt_p->st2, offset+2);
 
     stmt_p = stmt_p->next;
@@ -266,11 +242,7 @@ void printDefTree(DefNodePtr d) {
   fprintf(stderr, "[AST]\n");
 
   while(def_p != NULL) {
-    fprintf(stderr, "[Def]\n");
     printDef(def_p);
-
-    printOffsetSpace(2);
-    fprintf(stderr, "[Symbol]\n");
 
     printOffsetSpace(2);
     printSym(def_p->sym);
@@ -287,7 +259,6 @@ void printDefTree(DefNodePtr d) {
 
 // Symbol Table
 // Note: Print From LAST to HEAD
-// # USE THIS
 void printSymTable() {
   fprintf(stderr, "[Symbol Table]\n");
   SymEntryPtr sym_p = symtable;
@@ -298,7 +269,6 @@ void printSymTable() {
 }
 
 // Global Pointers
-// # USE THIS
 void printGlobalASTPointers() {
   fprintf(stderr, "symtable:   %p\n", symtable);
   fprintf(stderr, "curfunc:    %p\n", curfunc);
